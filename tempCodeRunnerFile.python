@@ -1,0 +1,33 @@
+actions={
+    'fast':{'distance':3, 'temp': 3},
+    'slow':{'distance':1, 'temp': -1},
+    'average':{"distance":2, "temp":2},
+    'stop':{"distance":0, "temp":0}
+}
+
+result = []
+
+def  optimale_solution():
+    goal = 40
+    temp_limit =  4
+    temp = 0
+    while goal <= 40:
+        if temp < temp_limit:
+            result.append('fast')
+            temp += actions['fast']['temp']
+            goal -= actions['fast']['distance']
+        elif temp == 3:
+            result.append('slow')
+            temp += actions['slow']['temp']
+            goal -= actions['slow']['distance']
+        elif temp == 2:
+            result.append('average')
+            temp += actions['average']['temp']
+            goal -= actions['average']['distance']
+        elif temp == 1:
+            result.append('slow')
+            temp += actions['slow']['temp']
+            goal -= actions['slow']['distance']
+        return result
+    
+print(optimale_solution())    
