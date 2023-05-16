@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Box, Paper, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import * as math from 'mathjs';
 
 const Trapezoid: React.FC = () => {
   const [expression, setExpression] = useState('');
@@ -16,14 +17,15 @@ const Trapezoid: React.FC = () => {
   const trapezoidCalc = (a: number, b: number, n: number, expression: string) => {
     let sum = 0;
     let delta = deltaX(b, a, n);
+    let fi, xi
 
     for (let i = 1; i < n; i++) {
-      let xi = a + i * delta;
-      let fi = eval(expression.replace('x', xi.toString())); 
+      xi = a + i * delta;
+      fi = math.evaluate(expression.replace('x', String(xi)));
       sum += fi;
     }
 
-    let result = delta * (eval(expression.replace('x', a.toString())) + eval(expression.replace('x', b.toString()))) / 2 + delta * sum;
+    let result = delta * (math.evaluate(expression.replace('x', a.toString())) + math.evaluate(expression.replace('x', b.toString()))) / 2 + delta * sum;
     setResult(result.toString());
   };
 

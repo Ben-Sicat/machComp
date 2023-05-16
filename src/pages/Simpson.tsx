@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Container, Box, Paper, Button, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { TextField, Button } from '@mui/material';
+import { styled } from '@mui/system';
+import * as math from 'mathjs';
 
 const Simpson: React.FC = () => {
   const [expression, setExpression] = useState('');
@@ -18,19 +19,19 @@ const Simpson: React.FC = () => {
     let sum2 = 0;
     let delta = deltaX(b, a, n);
     let xi, fi;
-
+  
     for (let i = 1; i < n; i++) {
       xi = a + i * delta;
-      fi = eval(expression.replace('x', xi.toString())); 
-
+      fi = math.evaluate(expression.replace('x', String(xi)));
+  
       if (i % 2 === 0) {
         sum2 += fi;
       } else {
         sum1 += fi;
       }
     }
-
-    let result = (delta / 3) * (eval(expression.replace('x', a.toString())) + eval(expression.replace('x', b.toString())) + 2 * sum2 + 4 * sum1);
+  
+    let result = (delta / 3) * (math.evaluate(expression.replace('x', String(a))) + math.evaluate(expression.replace('x', String(b))) + 2 * sum2 + 4 * sum1);
     setResult(result.toString());
   };
 
@@ -39,26 +40,54 @@ const Simpson: React.FC = () => {
     simpsonCalc(parseFloat(a), parseFloat(b), parseInt(n), expression);
   };
 
+  const FormContainer = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    maxWidth: '300px',
+    margin: '0 auto',
+  });
+
+  const SubmitButton = styled(Button)({
+    backgroundColor: '#2196f3',
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: '#1976d2',
+    },
+  });
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <label>
-          a:
-          <input type="text" value={a} onChange={(e) => setA(e.target.value)} />
-        </label>
-        <label>
-          b:
-          <input type="text" value={b} onChange={(e) => setB(e.target.value)} />
-        </label>
-        <label>
-          n:
-          <input type="text" value={n} onChange={(e) => setN(e.target.value)} />
-        </label>
-        <label>
-          f(x)
-          <input type="text" value={expression} onChange={(e) => setExpression(e.target.value)} />
-        </label>
-        <input type="submit" value="Submit" />
+        <FormContainer>
+          <TextField
+            label="a"
+            type="text"
+            value={a}
+            onChange={(e) => setA(e.target.value)}
+          />
+          <TextField
+            label="b"
+            type="text"
+            value={b}
+            onChange={(e) => setB(e.target.value)}
+          />
+          <TextField
+            label="n"
+            type="text"
+            value={n}
+            onChange={(e) => setN(e.target.value)}
+          />
+          <TextField
+            label="f(x)"
+            type="text"
+            value={expression}
+            onChange={(e) => setExpression(e.target.value)}
+          />
+          <SubmitButton variant="contained" type="submit">
+            Submit
+          </SubmitButton>
+        </FormContainer>
       </form>
       <p>Result: {result}</p>
     </div>
