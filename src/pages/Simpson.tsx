@@ -15,6 +15,7 @@ const Simpson: React.FC = () => {
   };
 
   const simpsonCalc = (a: number, b: number, n: number, expression: string) => {
+    const denominatorFn = math.parse(expression).compile();
     let sum1 = 0;
     let sum2 = 0;
     let delta = deltaX(b, a, n);
@@ -24,11 +25,21 @@ const Simpson: React.FC = () => {
       xi = a + i * delta;
       fi = math.evaluate(expression.replace('x', String(xi)));
   
+      if (!Number.isFinite(denominatorFn.evaluate({ x: xi }))) {
+        setResult('Error: Denominator function is divergent');
+        return;
+      }
+  
       if (i % 2 === 0) {
         sum2 += fi;
       } else {
         sum1 += fi;
       }
+    }
+  
+    if (!Number.isFinite(denominatorFn.evaluate({ x: a })) || !Number.isFinite(denominatorFn.evaluate({ x: b }))) {
+      setResult('Error: Denominator function is divergent');
+      return;
     }
   
     let result = (delta / 3) * (math.evaluate(expression.replace('x', String(a))) + math.evaluate(expression.replace('x', String(b))) + 2 * sum2 + 4 * sum1);

@@ -13,19 +13,30 @@ const Trapezoid: React.FC = () => {
   const deltaX = (x1: number, x2: number, n1: number) => {
     return (x1 - x2) / n1;
   };
-
   const trapezoidCalc = (a: number, b: number, n: number, expression: string) => {
+    const denominatorFn = math.parse(expression).compile();
     let sum = 0;
     let delta = deltaX(b, a, n);
-    let fi, xi
-
+    let fi, xi;
+  
     for (let i = 1; i < n; i++) {
       xi = a + i * delta;
       fi = math.evaluate(expression.replace('x', String(xi)));
+  
+      if (!Number.isFinite(denominatorFn.evaluate({ x: xi }))) {
+        setResult('Error: Denominator function is divergent');
+        return;
+      }
+  
       sum += fi;
     }
-
-    let result = delta * (math.evaluate(expression.replace('x', a.toString())) + math.evaluate(expression.replace('x', b.toString()))) / 2 + delta * sum;
+  
+    if (!Number.isFinite(denominatorFn.evaluate({ x: a })) || !Number.isFinite(denominatorFn.evaluate({ x: b }))) {
+      setResult('Error: Denominator function is divergent');
+      return;
+    }
+  
+    let result = (delta * (math.evaluate(expression.replace('x', a.toString())) + math.evaluate(expression.replace('x', b.toString()))) / 2) + (delta * sum);
     setResult(result.toString());
   };
 
