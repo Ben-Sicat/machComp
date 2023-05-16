@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Simpson, Home } from './pages/index';
+import { Simpson, Home, Trapezoid } from './pages/index';
 
 function App() {
   return (
@@ -8,6 +8,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path="/Simpson" element={<Simpson />} />
+        <Route path="/Trapezoid" element={<Trapezoid />} />
         {/* <Route path="/machinefour" element={} /> */}
       </Routes>
     </Router>

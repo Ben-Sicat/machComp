@@ -45,7 +45,17 @@ const Simpson: React.FC<Simpson> = () => {
               value={n}
               onChange={(e) => setN(e.target.value)}
             />
+          
           </label>
+          <label>
+            f(x)
+            <input
+              type="text"
+              value={expression}
+              onChange={(e) => setExpression(e.target.value)}
+            />
+          </label>
+
           <input type="submit" value="Submit" />
         </form>
         <p>Result: {result}</p>
