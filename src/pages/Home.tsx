@@ -1,11 +1,24 @@
 import React from 'react';
+import { Container, Box, Paper, Button, Typography} from '@mui/material';
 
+import { useNavigate } from 'react-router-dom';
 const Home: React.FC = () => {
+    const navigate = useNavigate();
     return (
-        <div>
-        <h1>Home</h1>
-        <p>Home page body content</p>
-        </div>
+        <Container>
+            <Box sx={{ my: 4 }}>
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="h4" component="h1" gutterBottom>
+                        Welcome to the Numerical Analysis App!
+                    </Typography>
+                    <Button variant="outlined"  onClick={() =>{ navigate('/Simpson')}}> 
+                        Simpson's Rule
+                    </Button>
+                </Paper>
+            </Box>
+        </Container>
+
+        
     );
 }
 export default Home;

@@ -1,4 +1,4 @@
 import Home from './Home';
-import MachineFour from './MachineFour';
+import Simpson from './Simpson';
 
-export  {Home, MachineFour};
+export  {Home, Simpson};
