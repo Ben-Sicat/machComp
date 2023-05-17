@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Container, Box, Paper, Button, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+// import { Container, Box, Paper, Button, Typography } from '@mui/material';
+// import { useNavigate } from 'react-router-dom';
 import * as math from 'mathjs';
 
 const Trapezoid: React.FC = () => {
