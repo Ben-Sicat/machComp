@@ -18,10 +18,16 @@ const Trapezoid: React.FC = () => {
     let sum = 0;
     let delta = deltaX(b, a, n);
     let fi, xi;
+    
   
     for (let i = 1; i < n; i++) {
       xi = a + i * delta;
-      fi = math.evaluate(expression.replace('x', String(xi)));
+       try {
+        fi = math.evaluate(expression, { x: xi });
+      } catch (error) {
+        setResult('Error: Invalid mathematical expression');
+        return;
+      }
   
       if (!Number.isFinite(denominatorFn.evaluate({ x: xi }))) {
         setResult('Error: Denominator function is divergent');
