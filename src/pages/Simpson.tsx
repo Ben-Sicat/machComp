@@ -23,7 +23,13 @@ const Simpson: React.FC = () => {
   
     for (let i = 1; i < n; i++) {
       xi = a + i * delta;
-      fi = math.evaluate(expression.replace('x', String(xi)));
+  
+      try {
+        fi = math.evaluate(expression, { x: xi });
+      } catch (error) {
+        setResult('Error: Invalid mathematical expression');
+        return;
+      }
   
       if (!Number.isFinite(denominatorFn.evaluate({ x: xi }))) {
         setResult('Error: Denominator function is divergent');
@@ -42,7 +48,7 @@ const Simpson: React.FC = () => {
       return;
     }
   
-    let result = (delta / 3) * (math.evaluate(expression.replace('x', String(a))) + math.evaluate(expression.replace('x', String(b))) + 2 * sum2 + 4 * sum1);
+    let result = (delta / 3) * (math.evaluate(expression, { x: a }) + math.evaluate(expression, { x: b }) + 2 * sum2 + 4 * sum1);
     setResult(result.toString());
   };
 
