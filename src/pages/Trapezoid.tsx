@@ -18,27 +18,37 @@ const Trapezoid: React.FC = () => {
     let sum = 0;
     let delta = deltaX(b, a, n);
     let fi, xi;
-    
+    let divergentIntervals = [];
   
     for (let i = 1; i < n; i++) {
       xi = a + i * delta;
-       try {
+      try {
         fi = math.evaluate(expression, { x: xi });
       } catch (error) {
         setResult('Error: Invalid mathematical expression');
         return;
       }
   
-      if (!Number.isFinite(denominatorFn.evaluate({ x: xi }))) {
-        setResult('Error: Denominator function is divergent');
-        return;
+      const denominatorValue = denominatorFn.evaluate({ x: xi });
+      if (!Number.isFinite(denominatorValue) || Number.isNaN(denominatorValue)) {
+        divergentIntervals.push(`[${xi - delta}, ${xi}]`);
       }
   
       sum += fi;
     }
   
-    if (!Number.isFinite(denominatorFn.evaluate({ x: a })) || !Number.isFinite(denominatorFn.evaluate({ x: b }))) {
-      setResult('Error: Denominator function is divergent');
+    const denominatorA = denominatorFn.evaluate({ x: a });
+    if (!Number.isFinite(denominatorA) || Number.isNaN(denominatorA)) {
+      divergentIntervals.push(`[${a}, ${a + delta}]`);
+    }
+  
+    const denominatorB = denominatorFn.evaluate({ x: b });
+    if (!Number.isFinite(denominatorB) || Number.isNaN(denominatorB)) {
+      divergentIntervals.push(`[${b - delta}, ${b}]`);
+    }
+  
+    if (divergentIntervals.length > 0) {
+      setResult(`Error: Denominator function is divergent in the following interval(s): ${divergentIntervals.join(', ')}`);
       return;
     }
   
