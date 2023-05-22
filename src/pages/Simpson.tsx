@@ -14,54 +14,54 @@ const Simpson: React.FC = () => {
     return (x1 - x2) / n1;
   };
 
+  const isFunctionUndefined = (x: number, expression: string) => {
+    try {
+      const value = math.evaluate(expression, { x });
+      return !Number.isFinite(value) || Number.isNaN(value) || Math.abs(x % (Math.PI / 2)) < 1e-6;
+    } catch (error) {
+      return true;
+    }
+  };
+
   const simpsonCalc = (a: number, b: number, n: number, expression: string) => {
-    const denominatorFn = math.parse(expression).compile();
+    const delta = deltaX(b, a, n);
+    const interval = [a, b];
+    const divergentIntervals = [];
+
+    if (isFunctionUndefined(a, expression)) {
+      divergentIntervals.push(`[${a}, ${a + delta}]`);
+    }
+
     let sum1 = 0;
     let sum2 = 0;
-    let delta = deltaX(b, a, n);
-    let xi, fi;
-    let divergentIntervals = [];
 
     for (let i = 1; i < n; i++) {
-      xi = a + i * delta;
+      const xi = a + i * delta;
 
-      try {
-        fi = math.evaluate(expression, { x: xi });
-      } catch (error) {
-        setResult('Error: Invalid mathematical expression');
-        return;
-      }
-
-      const denominatorValue = denominatorFn.evaluate({ x: xi });
-      if (!Number.isFinite(denominatorValue) || Number.isNaN(denominatorValue)) {
+      if (isFunctionUndefined(xi, expression)) {
         divergentIntervals.push(`[${xi - delta}, ${xi}]`);
       }
 
       if (i % 2 === 0) {
-        sum2 += fi;
+        sum2 += math.evaluate(expression, { x: xi });
       } else {
-        sum1 += fi;
+        sum1 += math.evaluate(expression, { x: xi });
       }
     }
 
-    const denominatorA = denominatorFn.evaluate({ x: a });
-    if (!Number.isFinite(denominatorA) || Number.isNaN(denominatorA)) {
-      divergentIntervals.push(`[${a}, ${a + delta}]`);
-    }
-
-    const denominatorB = denominatorFn.evaluate({ x: b });
-    if (!Number.isFinite(denominatorB) || Number.isNaN(denominatorB)) {
+    if (isFunctionUndefined(b, expression)) {
       divergentIntervals.push(`[${b - delta}, ${b}]`);
     }
 
     if (divergentIntervals.length > 0) {
-      setResult(`Error: Denominator function is divergent in the following interval(s): ${divergentIntervals.join(', ')}`);
+      setResult(`Error: Function is undefined in the following interval(s): ${divergentIntervals.join(', ')}`);
       return;
     }
 
-    let result = (delta / 3) * (math.evaluate(expression, { x: a }) + math.evaluate(expression, { x: b }) + 2 * sum2 + 4 * sum1);
+    const result = (delta / 3) * (math.evaluate(expression, { x: a }) + math.evaluate(expression, { x: b }) + 2 * sum2 + 4 * sum1);
     setResult(result.toString());
   };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     simpsonCalc(parseFloat(a), parseFloat(b), parseInt(n), expression);
@@ -86,35 +86,23 @@ const Simpson: React.FC = () => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <FormContainer>
-          <TextField
-            label="a"
-            type="text"
-            value={a}
-            onChange={(e) => setA(e.target.value)}
-          />
-          <TextField
-            label="b"
-            type="text"
-            value={b}
-            onChange={(e) => setB(e.target.value)}
-          />
-          <TextField
-            label="n"
-            type="text"
-            value={n}
-            onChange={(e) => setN(e.target.value)}
-          />
-          <TextField
-            label="f(x)"
-            type="text"
-            value={expression}
-            onChange={(e) => setExpression(e.target.value)}
-          />
-          <SubmitButton variant="contained" type="submit">
-            Submit
-          </SubmitButton>
-        </FormContainer>
+        <label>
+          a:
+          <input type="text" value={a} onChange={(e) => setA(e.target.value)} />
+        </label>
+        <label>
+          b:
+          <input type="text" value={b} onChange={(e) => setB(e.target.value)} />
+        </label>
+        <label>
+          n:
+          <input type="text" value={n} onChange={(e) => setN(e.target.value)} />
+        </label>
+        <label>
+          f(x)
+          <input type="text" value={expression} onChange={(e) => setExpression(e.target.value)} />
+        </label>
+        <input type="submit" value="Submit" />
       </form>
       <p>Result: {result}</p>
     </div>

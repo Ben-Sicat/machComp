@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-// import { Container, Box, Paper, Button, Typography } from '@mui/material';
-// import { useNavigate } from 'react-router-dom';
 import * as math from 'mathjs';
 
 const Trapezoid: React.FC = () => {
@@ -13,46 +11,44 @@ const Trapezoid: React.FC = () => {
   const deltaX = (x1: number, x2: number, n1: number) => {
     return (x1 - x2) / n1;
   };
+
   const trapezoidCalc = (a: number, b: number, n: number, expression: string) => {
-    const denominatorFn = math.parse(expression).compile();
+    try {
+      math.evaluate(expression.replace('x', '0')); // Check if the expression is valid
+    } catch (error) {
+      setResult('Error: Invalid mathematical expression');
+      return;
+    }
+
+    const fn = math.parse(expression).compile();
     let sum = 0;
     let delta = deltaX(b, a, n);
-    let fi, xi;
-    let divergentIntervals = [];
-  
-    for (let i = 1; i < n; i++) {
+    let xi;
+    let undefinedPoint: number | null = null;
+
+    for (let i = 0; i <= n; i++) {
       xi = a + i * delta;
       try {
-        fi = math.evaluate(expression, { x: xi });
+        const fi = fn.evaluate({ x: xi });
+        if (!Number.isFinite(fi) || Number.isNaN(fi)) {
+          undefinedPoint = xi;
+          break;
+        }
+        if (i > 0 && i < n) {
+          sum += fi;
+        }
       } catch (error) {
         setResult('Error: Invalid mathematical expression');
         return;
       }
-  
-      const denominatorValue = denominatorFn.evaluate({ x: xi });
-      if (!Number.isFinite(denominatorValue) || Number.isNaN(denominatorValue)) {
-        divergentIntervals.push(`[${xi - delta}, ${xi}]`);
-      }
-  
-      sum += fi;
     }
-  
-    const denominatorA = denominatorFn.evaluate({ x: a });
-    if (!Number.isFinite(denominatorA) || Number.isNaN(denominatorA)) {
-      divergentIntervals.push(`[${a}, ${a + delta}]`);
-    }
-  
-    const denominatorB = denominatorFn.evaluate({ x: b });
-    if (!Number.isFinite(denominatorB) || Number.isNaN(denominatorB)) {
-      divergentIntervals.push(`[${b - delta}, ${b}]`);
-    }
-  
-    if (divergentIntervals.length > 0) {
-      setResult(`Error: Denominator function is divergent in the following interval(s): ${divergentIntervals.join(', ')}`);
+
+    if (undefinedPoint !== null) {
+      setResult(`Error: The function is undefined at x = ${undefinedPoint}`);
       return;
     }
-  
-    let result = (delta * (math.evaluate(expression.replace('x', a.toString())) + math.evaluate(expression.replace('x', b.toString()))) / 2) + (delta * sum);
+
+    let result = (delta * (fn.evaluate({ x: a }) + fn.evaluate({ x: b })) / 2) + (delta * sum);
     setResult(result.toString());
   };
 
