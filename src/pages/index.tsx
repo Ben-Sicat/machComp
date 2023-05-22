@@ -1,5 +1,5 @@
 import Home from './Home';
 import UserDefined from './UserDefined';
-import Trapezoid from './Trapezoid';
+import PreDefined from './PreDefined';
 
-export  {Home, UserDefined, Trapezoid};
+export  {Home, UserDefined, PreDefined};
