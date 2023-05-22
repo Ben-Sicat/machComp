@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button } from '@mui/material';
-import { styled } from '@mui/system';
+// import { Button } from '@mui/material';
+// import { styled } from '@mui/system';
 import * as math from 'mathjs';
 
 const Simpson: React.FC = () => {
