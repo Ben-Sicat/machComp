@@ -24,15 +24,17 @@ const Trapezoid: React.FC = () => {
     let sum = 0;
     let delta = deltaX(b, a, n);
     let xi;
-    let undefinedPoint: number | null = null;
+    let undefinedPoints: number[] = [];
 
     for (let i = 0; i <= n; i++) {
       xi = a + i * delta;
       try {
         const fi = fn.evaluate({ x: xi });
         if (!Number.isFinite(fi) || Number.isNaN(fi)) {
-          undefinedPoint = xi;
-          break;
+          undefinedPoints.push(xi);
+        } else if (undefinedPoints.length > 0) {
+          setResult(`Error: The function is undefined at x = ${undefinedPoints.join(', ')}`);
+          return;
         }
         if (i > 0 && i < n) {
           sum += fi;
@@ -41,11 +43,6 @@ const Trapezoid: React.FC = () => {
         setResult('Error: Invalid mathematical expression');
         return;
       }
-    }
-
-    if (undefinedPoint !== null) {
-      setResult(`Error: The function is undefined at x = ${undefinedPoint}`);
-      return;
     }
 
     let result = (delta * (fn.evaluate({ x: a }) + fn.evaluate({ x: b })) / 2) + (delta * sum);
