@@ -11,11 +11,11 @@ const Home: React.FC = () => {
                     <Typography variant="h4" component="h1" gutterBottom>
                         Welcome to the Numerical Analysis App!
                     </Typography>
-                    <Button variant="outlined"  onClick={() =>{ navigate('/Simpson')}}> 
-                        Simpson's Rule
+                    <Button variant="outlined"  onClick={() =>{ navigate('/PreDefined')}}> 
+                        PRE-DEFINED
                     </Button>
-                    <Button variant="outlined"  onClick={() =>{ navigate('/Trapezoid')}}> 
-                        Trapezoid Rule
+                    <Button variant="outlined"  onClick={() =>{ navigate('/UserDefined')}}> 
+                        USER-DEFINED
                     </Button>
                 </Paper>
             </Box>
