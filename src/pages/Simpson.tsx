@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { styled } from '@mui/system';
 import * as math from 'mathjs';
 
@@ -25,7 +25,7 @@ const Simpson: React.FC = () => {
 
   const simpsonCalc = (a: number, b: number, n: number, expression: string) => {
     const delta = deltaX(b, a, n);
-    const interval = [a, b];
+    // const interval = [a, b];
     const divergentIntervals = [];
 
     if (isFunctionUndefined(a, expression)) {
@@ -67,21 +67,21 @@ const Simpson: React.FC = () => {
     simpsonCalc(parseFloat(a), parseFloat(b), parseInt(n), expression);
   };
 
-  const FormContainer = styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    maxWidth: '300px',
-    margin: '0 auto',
-  });
+  // const FormContainer = styled('div')({
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   gap: '1rem',
+  //   maxWidth: '300px',
+  //   margin: '0 auto',
+  // });
 
-  const SubmitButton = styled(Button)({
-    backgroundColor: '#2196f3',
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: '#1976d2',
-    },
-  });
+  // const SubmitButton = styled(Button)({
+  //   backgroundColor: '#2196f3',
+  //   color: '#fff',
+  //   '&:hover': {
+  //     backgroundColor: '#1976d2',
+  //   },
+  // });
 
   return (
     <div>
