@@ -80,7 +80,7 @@ const Trapezoid: React.FC = () => {
       const trapezoidResult = (delta / 2) * (fFn.evaluate({ x: parsedA }) / (gFn ? gFn.evaluate({ x: parsedA }) : 1) + fFn.evaluate({ x: parsedB }) / (gFn ? gFn.evaluate({ x: parsedB }) : 1)) + (delta * sumTrapezoid);
       setResultTrapezoid(trapezoidResult.toString());
 
-      const simpsonResult = (delta / 3) * (fFn.evaluate({ x: parsedA }) / (gFn ? gFn.evaluate({ x: parsedA }) : 1) + fFn.evaluate({ x: parsedB }) / (gFn ? gFn.evaluate({ x: parsedB }) : 1)) + ((delta / 3) * sumSimpson);
+      const simpsonResult = (delta / 3) * (fFn.evaluate({ x: parsedA }) / (gFn ? gFn.evaluate({ x: parsedA }) : 1) + fFn.evaluate({ x: parsedB }) / (gFn ? gFn.evaluate({ x: parsedB }) : 1) + sumSimpson);
       setResultSimpson(simpsonResult.toString());
     }
   };
