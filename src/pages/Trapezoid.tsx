@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Typography, TextField, Button } from '@mui/material';
-import { parse, evaluate } from 'mathjs';
+import { parse } from 'mathjs';
 
 const Trapezoid: React.FC = () => {
   const [values, setValues] = useState({
