@@ -1,61 +1,63 @@
 import React, { useState } from 'react';
-import { styled } from '@mui/system';
-import { TextField, Button, Typography, Container } from '@mui/material';
-
-import * as math from 'mathjs';
-const FormContainer = styled(Container)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10rem;
-  margin-bottom: 24px;
-`;
-
-const ResultContainer = styled(Container)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  widht: 100%;
-  gap: 8px;
-`;
+import { Container, Typography, TextField, Button } from '@mui/material';
+import { parse, evaluate } from 'mathjs';
 
 const Trapezoid: React.FC = () => {
-  const [expression, setExpression] = useState('');
-  const [resultTrapezoid, setResultTrapezoid] = useState('');
-  const [resultSimpson, setResultSimpson] = useState('');
-  const [a, setA] = useState('');
-  const [b, setB] = useState('');
-  const [n, setN] = useState('');
+  const [a, setA] = useState<string>('');
+  const [b, setB] = useState<string>('');
+  const [n, setN] = useState<string>('');
+  const [expression, setExpression] = useState<string>('');
+  const [resultTrapezoid, setResultTrapezoid] = useState<string>('');
+  const [resultSimpson, setResultSimpson] = useState<string>('');
 
-  const deltaX = (x1: number, x2: number, n1: number) => {
-    return (x2 - x1) / n1;
-  };
+  const deltaX = (a: number, b: number, n: number) => (b - a) / n;
 
   const trapezoidCalc = (a: number, b: number, n: number, expression: string) => {
+    let fExpression = expression;
+    let gExpression = '';
+
+    const divideIndex = expression.indexOf('/');
+    if (divideIndex !== -1) {
+      fExpression = expression.substring(0, divideIndex).trim();
+      gExpression = expression.substring(divideIndex + 1).trim();
+    }
+
     try {
-      math.evaluate(expression.replace('x', '0')); // Check if the expression is valid
+      evaluate(fExpression.replace('x', '0')); // Check if the f(x) expression is valid
     } catch (error) {
-      setResultTrapezoid('Error: f(x) is not valid. Numerical method cannot be used.');
+      setResultTrapezoid('Error: f(x) is not a valid mathematical expression. Numerical method cannot be used.');
       return;
     }
 
-    const fn = math.parse(expression).compile();
+    if (gExpression) {
+      try {
+        evaluate(gExpression.replace('x', '0')); // Check if the g(x) expression is valid
+      } catch (error) {
+        setResultTrapezoid('Error: g(x) is not a valid mathematical expression. Numerical method cannot be used.');
+        return;
+      }
+    }
+
+    const fFn = parse(fExpression).compile();
+    const gFn = gExpression ? parse(gExpression).compile() : null;
+
     let sum = 0;
     let delta = deltaX(a, b, n);
     let xi;
     let undefinedPoint: number | null = null;
 
-    for (let i = 0; i <= n; i++) {
+    for (let i = 1; i < n; i++) {
       xi = a + i * delta;
       try {
-        const fi = fn.evaluate({ x: xi });
-        if (!Number.isFinite(fi) || Number.isNaN(fi)) {
+        const fi = fFn.evaluate({ x: xi });
+        const gi = gFn ? gFn.evaluate({ x: xi }) : 1;
+
+        if (!Number.isFinite(fi) || Number.isNaN(fi) || !Number.isFinite(gi) || Number.isNaN(gi) || gi === 0 || gi === Infinity) {
           undefinedPoint = xi;
           break;
         }
-        if (i > 0 && i < n) {
-          sum += fi;
-        }
+
+        sum += fi / gi;
       } catch (error) {
         setResultTrapezoid('Error: Invalid mathematical expression');
         return;
@@ -63,42 +65,63 @@ const Trapezoid: React.FC = () => {
     }
 
     if (undefinedPoint !== null) {
-      setResultTrapezoid(`Error: f(x) is not defined at x = ${undefinedPoint}. Numerical method cannot be used.`);
+      setResultTrapezoid(`Error: g(x) is not defined or equals to 0  at x = ${undefinedPoint}. Numerical method cannot be used.`);
     } else {
-      let result = (delta * (fn.evaluate({ x: a }) + fn.evaluate({ x: b })) / 2) + (delta * sum);
+      let result = (delta * (fFn.evaluate({ x: a }) / (gFn ? gFn.evaluate({ x: a }) : 1) + fFn.evaluate({ x: b }) / (gFn ? gFn.evaluate({ x: b }) : 1))) / 2 + (delta * sum);
       setResultTrapezoid(result.toString());
     }
   };
 
   const simpsonCalc = (a: number, b: number, n: number, expression: string) => {
+    let fExpression = expression;
+    let gExpression = '';
+
+    const divideIndex = expression.indexOf('/');
+    if (divideIndex !== -1) {
+      fExpression = expression.substring(0, divideIndex).trim();
+      gExpression = expression.substring(divideIndex + 1).trim();
+    }
+
     try {
-      math.evaluate(expression.replace('x', '0')); // Check if the expression is valid
+      evaluate(fExpression.replace('x', '0')); // Check if the f(x) expression is valid
     } catch (error) {
-      setResultSimpson('Error: f(x) is not valid. Numerical method cannot be used.');
+      setResultSimpson('Error: f(x) is not a valid mathematical expression. Numerical method cannot be used.');
       return;
     }
 
-    const fn = math.parse(expression).compile();
+    if (gExpression) {
+      try {
+        evaluate(gExpression.replace('x', '0')); // Check if the g(x) expression is valid
+      } catch (error) {
+        setResultSimpson('Error: g(x) is not a valid mathematical expression. Numerical method cannot be used.');
+        return;
+      }
+    }
+
+    const fFn = parse(fExpression).compile();
+    const gFn = gExpression ? parse(gExpression).compile() : null;
+
     let sum1 = 0;
     let sum2 = 0;
     let delta = deltaX(a, b, n);
     let xi;
     let undefinedPoint: number | null = null;
 
-    for (let i = 0; i <= n; i++) {
+    for (let i = 1; i < n; i++) {
       xi = a + i * delta;
       try {
-        const fi = fn.evaluate({ x: xi });
-        if (!Number.isFinite(fi) || Number.isNaN(fi)) {
+        const fi = fFn.evaluate({ x: xi });
+        const gi = gFn ? gFn.evaluate({ x: xi }) : 1;
+
+        if (!Number.isFinite(fi) || Number.isNaN(fi) || !Number.isFinite(gi) || Number.isNaN(gi) || gi === 0 || gi === Infinity) {
           undefinedPoint = xi;
           break;
         }
-        if (i > 0 && i < n) {
-          if (i % 2 === 0) {
-            sum2 += fi;
-          } else {
-            sum1 += fi;
-          }
+
+        if (i % 2 === 0) {
+          sum2 += fi / gi;
+        } else {
+          sum1 += fi / gi;
         }
       } catch (error) {
         setResultSimpson('Error: Invalid mathematical expression');
@@ -107,70 +130,96 @@ const Trapezoid: React.FC = () => {
     }
 
     if (undefinedPoint !== null) {
-      setResultSimpson(`Error: f(x) is not defined at x = ${undefinedPoint}. Numerical method cannot be used.`);
+      setResultSimpson(`Error: g(x) is not defined or equals to 0  at x = ${undefinedPoint}. Numerical method cannot be used.`);
     } else {
-      let result = (delta / 3) * (fn.evaluate({ x: a }) + fn.evaluate({ x: b }) + 4 * sum1 + 2 * sum2);
+      let result = (delta / 3) * (fFn.evaluate({ x: a }) / (gFn ? gFn.evaluate({ x: a }) : 1) + fFn.evaluate({ x: b }) / (gFn ? gFn.evaluate({ x: b }) : 1)) + (4 * sum1 + 2 * sum2);
       setResultSimpson(result.toString());
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setResultTrapezoid('');
-    setResultSimpson('');
-    trapezoidCalc(parseFloat(a), parseFloat(b), parseInt(n), expression);
-    simpsonCalc(parseFloat(a), parseFloat(b), parseInt(n), expression);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!a || !b || !n || !expression) {
+      setResultTrapezoid('Please fill in all the required fields.');
+      setResultSimpson('');
+      return;
+    }
+
+    const parsedA = parseFloat(a);
+    const parsedB = parseFloat(b);
+    const parsedN = parseInt(n);
+
+    if (isNaN(parsedA) || isNaN(parsedB) || isNaN(parsedN)) {
+      setResultTrapezoid('Invalid input. Please enter numerical values.');
+      setResultSimpson('');
+      return;
+    }
+
+    trapezoidCalc(parsedA, parsedB, parsedN, expression);
+    simpsonCalc(parsedA, parsedB, parsedN, expression);
   };
 
-  function predefined(): void {
-    setA('-1');
-    setB('1');
-    setN('10');
-    setExpression('e^2/tanh(x)');
-
-  }
+  const predefined = () => {
+    setA('-2');
+    setB('2');
+    setN('100');
+    setExpression('1/tanh(x)');
+    setResultTrapezoid('');
+    setResultSimpson('');
+  };
 
   return (
     <Container maxWidth="sm">
-      <FormContainer>
-        <Typography variant="h6">Numerical Integration</Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="a"
-            type="text"
-            value={a}
-            onChange={(e) => setA(e.target.value)}
-          />
-          <TextField
-            label="b"
-            type="text"
-            value={b}
-            onChange={(e) => setB(e.target.value)}
-          />
-          <TextField
-            label="n"
-            type="text"
-            value={n}
-            onChange={(e) => setN(e.target.value)}
-          />
-          <TextField
-            label="f(x)"
-            type="text"
-            value={expression}
-            onChange={(e) => setExpression(e.target.value)}
-          />
-          <Button type="submit" variant="contained" color="primary">
-            Submit
-          </Button>
-          <Button type="reset" variant="contained" color="secondary" onClick={predefined}>
-            PreDefined
-          </Button>
-        </form>
-      </FormContainer>
-      <ResultContainer>
-        {resultTrapezoid && <Typography>Trapezoidal Method Result: {resultTrapezoid}</Typography>}
-        {resultSimpson && <Typography>Simpson's Method Result: {resultSimpson}</Typography>}
-      </ResultContainer>
+      <Typography variant="h4" align="center" gutterBottom>
+        Trapezoid and Simpson's Rule Calculator
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Lower Bound (a)"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={a}
+          onChange={(e) => setA(e.target.value)}
+        />
+        <TextField
+          label="Upper Bound (b)"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={b}
+          onChange={(e) => setB(e.target.value)}
+        />
+        <TextField
+          label="Subintervals (n)"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={n}
+          onChange={(e) => setN(e.target.value)}
+        />
+        <TextField
+          label="Expression (f(x) / g(x))"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={expression}
+          onChange={(e) => setExpression(e.target.value)}
+        />
+        <Button type="submit" variant="contained" color="primary">
+          Calculate
+        </Button>
+        <Button variant="outlined" onClick={predefined} style={{ marginLeft: '10px' }}>
+          Use Predefined Values
+        </Button>
+      </form>
+      <Typography variant="h6" align="center" gutterBottom>
+        Trapezoid Rule Result: {resultTrapezoid}
+      </Typography>
+      <Typography variant="h6" align="center" gutterBottom>
+        Simpson's Rule Result: {resultSimpson}
+      </Typography>
     </Container>
   );
 };
