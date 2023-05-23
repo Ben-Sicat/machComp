@@ -122,6 +122,14 @@ const Trapezoid: React.FC = () => {
     simpsonCalc(parseFloat(a), parseFloat(b), parseInt(n), expression);
   };
 
+  function predefined(): void {
+    setA('-1');
+    setB('1');
+    setN('10');
+    setExpression('e^2/tanh(x)');
+
+  }
+
   return (
     <Container maxWidth="sm">
       <FormContainer>
@@ -153,6 +161,9 @@ const Trapezoid: React.FC = () => {
           />
           <Button type="submit" variant="contained" color="primary">
             Submit
+          </Button>
+          <Button type="reset" variant="contained" color="secondary" onClick={predefined}>
+            PreDefined
           </Button>
         </form>
       </FormContainer>
