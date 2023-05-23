@@ -23,7 +23,7 @@ const Trapezoid: React.FC = () => {
     }
 
     try {
-      evaluate(fExpression.replace('x', '0')); // Check if the f(x) expression is valid
+      evaluate(fExpression.replace('x', '0')); 
     } catch (error) {
       setResultTrapezoid('Error: f(x) is not a valid mathematical expression. Numerical method cannot be used.');
       return;
@@ -31,7 +31,7 @@ const Trapezoid: React.FC = () => {
 
     if (gExpression) {
       try {
-        evaluate(gExpression.replace('x', '0')); // Check if the g(x) expression is valid
+        evaluate(gExpression.replace('x', '0')); 
       } catch (error) {
         setResultTrapezoid('Error: g(x) is not a valid mathematical expression. Numerical method cannot be used.');
         return;
@@ -83,7 +83,7 @@ const Trapezoid: React.FC = () => {
     }
 
     try {
-      evaluate(fExpression.replace('x', '0')); // Check if the f(x) expression is valid
+      evaluate(fExpression.replace('x', '0')); 
     } catch (error) {
       setResultSimpson('Error: f(x) is not a valid mathematical expression. Numerical method cannot be used.');
       return;
@@ -91,7 +91,7 @@ const Trapezoid: React.FC = () => {
 
     if (gExpression) {
       try {
-        evaluate(gExpression.replace('x', '0')); // Check if the g(x) expression is valid
+        evaluate(gExpression.replace('x', '0')); 
       } catch (error) {
         setResultSimpson('Error: g(x) is not a valid mathematical expression. Numerical method cannot be used.');
         return;
