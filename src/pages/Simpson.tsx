@@ -1,22 +1,16 @@
 import React, { useState } from 'react';
 // import { Button } from '@mui/material';
 // import { styled } from '@mui/system';
-import * as math from 'mathjs';
+// import * as math from 'mathjs';
 import { FormEvent } from 'react';
 
 const Simpson: React.FC = () => {
   const [expression, setExpression] = useState('');
-  const [result, setResult] = useState('');
+  const [result] = useState('');
   const [a, setA] = useState('');
   const [b, setB] = useState('');
   const [n, setN] = useState('');
 
-  const deltaX = (x1: number, x2: number, n1: number) => {
-    return (x1 - x2) / n1;
-  };
-  const trapezoidCalc = (a: number, b: number, n: number, expression: string) => {
-    
-  }
 
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
