@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Typography, TextField, Button } from '@mui/material';
-import { parse } from 'mathjs';
+import { parse, evaluate } from 'mathjs';
 
 const Trapezoid: React.FC = () => {
   const [values, setValues] = useState({
@@ -38,25 +38,35 @@ const Trapezoid: React.FC = () => {
       return;
     }
 
-    let sumTrapezoid = 0;
-    let sumSimpson = 0;
     const delta = (parsedB - parsedA) / parsedN;
     const fExpression = expression.split('/')[0].trim();
     const gExpression = expression.split('/')[1]?.trim();
     const fFn = parse(fExpression).compile();
     const gFn = gExpression ? parse(gExpression).compile() : null;
 
-    let undefinedPoint: number | null = null;
+    let sumTrapezoid = 0;
+    let sumSimpson = 0;
+    let divergentPoint: number | null = null;
 
     for (let i = 1; i < parsedN; i++) {
       const xi = parsedA + i * delta;
+
       try {
         const fi = fFn.evaluate({ x: xi });
         const gi = gFn ? gFn.evaluate({ x: xi }) : 1;
 
         if (!Number.isFinite(fi) || Number.isNaN(fi) || !Number.isFinite(gi) || Number.isNaN(gi) || gi === 0 || gi === Infinity) {
-          undefinedPoint = xi;
-          break;
+          divergentPoint = findDivergentPoint(parsedA, parsedB, gFn);
+
+          if (divergentPoint === null) {
+            setResultTrapezoid('Math error. Integral is divergent.');
+            setResultSimpson('Math error. Integral is divergent.');
+            return;
+          }
+
+          setResultTrapezoid(`Math error. Divergent. Finding the root of the denominator. Function is not defined at ${divergentPoint.toFixed(15)} in interval's (${parsedA}, ${parsedB})`);
+          setResultSimpson(`Math error. Divergent. Finding the root of the denominator. Function is not defined at ${divergentPoint.toFixed(15)} in interval's (${parsedA}, ${parsedB})`);
+          return;
         }
 
         sumTrapezoid += fi / gi;
@@ -73,16 +83,34 @@ const Trapezoid: React.FC = () => {
       }
     }
 
-    if (undefinedPoint !== null) {
-      setResultTrapezoid(`Error: g(x) is not defined or equals to 0 at x = ${undefinedPoint}. Numerical method cannot be used.`);
-      setResultSimpson(`Error: g(x) is not defined or equals to 0 at x = ${undefinedPoint}. Numerical method cannot be used.`);
-    } else {
-      const trapezoidResult = (delta / 2) * (fFn.evaluate({ x: parsedA }) / (gFn ? gFn.evaluate({ x: parsedA }) : 1) + fFn.evaluate({ x: parsedB }) / (gFn ? gFn.evaluate({ x: parsedB }) : 1)) + (delta * sumTrapezoid);
-      setResultTrapezoid(trapezoidResult.toString());
+    const trapezoidResult = (delta / 2) * (fFn.evaluate({ x: parsedA }) / (gFn ? gFn.evaluate({ x: parsedA }) : 1) + fFn.evaluate({ x: parsedB }) / (gFn ? gFn.evaluate({ x: parsedB }) : 1)) + (delta * sumTrapezoid);
+    setResultTrapezoid(trapezoidResult.toFixed(15));
 
-      const simpsonResult = (delta / 3) * (fFn.evaluate({ x: parsedA }) / (gFn ? gFn.evaluate({ x: parsedA }) : 1) + fFn.evaluate({ x: parsedB }) / (gFn ? gFn.evaluate({ x: parsedB }) : 1) + sumSimpson);
-      setResultSimpson(simpsonResult.toString());
+    const simpsonResult = (delta / 3) * (fFn.evaluate({ x: parsedA }) / (gFn ? gFn.evaluate({ x: parsedA }) : 1) + fFn.evaluate({ x: parsedB }) / (gFn ? gFn.evaluate({ x: parsedB }) : 1) + sumSimpson);
+    setResultSimpson(simpsonResult.toFixed(15));
+  };
+
+  const findDivergentPoint = (a: number, b: number, gFn: any): number | null => {
+    const epsilon = 1e-10; // Desired precision for the root
+    let left = a;
+    let right = b;
+
+    while (right - left > epsilon) {
+      const mid = (left + right) / 2;
+      const gMid = gFn.evaluate({ x: mid });
+
+      if (Math.abs(gMid) < epsilon) {
+        return mid;
+      }
+
+      if (gMid > 0) {
+        right = mid;
+      } else {
+        left = mid;
+      }
     }
+
+    return null;
   };
 
   const predefined = () => {
@@ -90,7 +118,7 @@ const Trapezoid: React.FC = () => {
       a: '-2',
       b: '2',
       n: '100',
-      expression: '1/tanh(x)',
+      expression: '1/cos(x)',
     });
     setResultTrapezoid('');
     setResultSimpson('');
@@ -148,9 +176,11 @@ const Trapezoid: React.FC = () => {
       <Typography variant="h6" align="center" gutterBottom>
         Trapezoid Rule Result: {resultTrapezoid}
       </Typography>
-      <Typography variant="h6" align="center" gutterBottom>
-        Simpson's Rule Result: {resultSimpson}
-      </Typography>
+      {resultSimpson && (
+        <Typography variant="h6" align="center" gutterBottom>
+          Simpson's Rule Result: {resultSimpson}
+        </Typography>
+      )}
     </Container>
   );
 };
