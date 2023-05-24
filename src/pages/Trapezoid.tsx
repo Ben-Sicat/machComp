@@ -9,8 +9,8 @@ const Trapezoid: React.FC = () => {
     n: '100',
     expression: '1/cos(x)',
   });
-  const [resultTrapezoid, setResultTrapezoid] = useState<string>('');
-  const [resultSimpson, setResultSimpson] = useState<string>('');
+  const [resultTrapezoid, setResultTrapezoid] = useState<string | undefined>('');
+  const [resultSimpson, setResultSimpson] = useState<string | undefined>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues((prevValues) => ({
@@ -44,9 +44,18 @@ const Trapezoid: React.FC = () => {
     const fFn = parse(fExpression).compile();
     const gFn = gExpression ? parse(gExpression).compile() : null;
 
+    if (gFn) {
+      const divergentPoint = findDivergentPoint(parsedA, parsedB, gFn);
+
+      if (divergentPoint !== null) {
+        setResultTrapezoid(`Math error. Function is not integrable. Root of the denominator exists at ${divergentPoint.toFixed(15)}.`);
+        setResultSimpson(`Math error. Function is not integrable. Root of the denominator exists at ${divergentPoint.toFixed(15)}.`);
+        return;
+      }
+    }
+
     let sumTrapezoid = 0;
     let sumSimpson = 0;
-    let divergentPoint: number | null = null;
 
     for (let i = 1; i < parsedN; i++) {
       const xi = parsedA + i * delta;
@@ -56,16 +65,8 @@ const Trapezoid: React.FC = () => {
         const gi = gFn ? gFn.evaluate({ x: xi }) : 1;
 
         if (!Number.isFinite(fi) || Number.isNaN(fi) || !Number.isFinite(gi) || Number.isNaN(gi) || gi === 0 || gi === Infinity) {
-          divergentPoint = findDivergentPoint(parsedA, parsedB, gFn);
-
-          if (divergentPoint === null) {
-            setResultTrapezoid('Math error. Integral is divergent.');
-            setResultSimpson('Math error. Integral is divergent.');
-            return;
-          }
-
-          setResultTrapezoid(`Math error. Divergent. Finding the root of the denominator. Function is not defined at ${divergentPoint.toFixed(15)} in interval's (${parsedA}, ${parsedB})`);
-          setResultSimpson(`Math error. Divergent. Finding the root of the denominator. Function is not defined at ${divergentPoint.toFixed(15)} in interval's (${parsedA}, ${parsedB})`);
+          setResultTrapezoid('Math error. Integral is divergent.');
+          setResultSimpson('Math error. Integral is divergent.');
           return;
         }
 
@@ -91,7 +92,7 @@ const Trapezoid: React.FC = () => {
   };
 
   const findDivergentPoint = (a: number, b: number, gFn: any): number | null => {
-    const epsilon = 1e-10; 
+    const epsilon = 1e-15;
     let left = a;
     let right = b;
 
@@ -120,8 +121,8 @@ const Trapezoid: React.FC = () => {
       n: '100',
       expression: '1/cos(x)',
     });
-    setResultTrapezoid('');
-    setResultSimpson('');
+    setResultTrapezoid(undefined);
+    setResultSimpson(undefined);
   };
 
   return (
@@ -174,9 +175,9 @@ const Trapezoid: React.FC = () => {
         </Button>
       </form>
       <Typography variant="h6" align="center" gutterBottom>
-        Trapezoid Rule Result: {resultTrapezoid}
+        Trapezoid Rule Result: {resultTrapezoid !== undefined ? resultTrapezoid : 'undefined'}
       </Typography>
-      {resultSimpson && (
+      {resultSimpson !== undefined && (
         <Typography variant="h6" align="center" gutterBottom>
           Simpson's Rule Result: {resultSimpson}
         </Typography>
