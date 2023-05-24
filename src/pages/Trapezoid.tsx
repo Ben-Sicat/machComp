@@ -48,8 +48,8 @@ const Trapezoid: React.FC = () => {
       const divergentPoint = findDivergentPoint(parsedA, parsedB, gFn);
 
       if (divergentPoint !== null) {
-        setResultTrapezoid(`Math error. Function is not integrable. Root of the denominator exists at ${divergentPoint.toFixed(15)}.`);
-        setResultSimpson(`Math error. Function is not integrable. Root of the denominator exists at ${divergentPoint.toFixed(15)}.`);
+        setResultTrapezoid(`Math error. Function is not integrable. Root of the denominator exists at ${divergentPoint}.`);
+        setResultSimpson(`Math error. Function is not integrable. Root of the denominator exists at ${divergentPoint}.`);
         return;
       }
     }
@@ -92,7 +92,7 @@ const Trapezoid: React.FC = () => {
   };
 
   const findDivergentPoint = (a: number, b: number, gFn: any): number | null => {
-    const epsilon = 1e-15;
+    const epsilon = 1e-30;
     let left = a;
     let right = b;
 
