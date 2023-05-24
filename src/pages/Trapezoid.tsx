@@ -92,7 +92,7 @@ const Trapezoid: React.FC = () => {
   };
 
   const findDivergentPoint = (a: number, b: number, gFn: any): number | null => {
-    const epsilon = 1e-30;
+    const epsilon = 1e-15;
     let left = a;
     let right = b;
 
