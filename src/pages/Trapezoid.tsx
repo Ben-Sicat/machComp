@@ -39,8 +39,9 @@ const Trapezoid: React.FC = () => {
     }
 
     const delta = (parsedB - parsedA) / parsedN;
-    const fExpression = expression.split('/')[0].trim();
-    const gExpression = expression.split('/')[1]?.trim();
+    const slashIndex = expression.indexOf('/');
+    const fExpression = expression.substring(0, slashIndex).trim();
+    const gExpression = expression.substring(slashIndex + 1).trim();
     const fFn = parse(fExpression).compile();
     const gFn = gExpression ? parse(gExpression).compile() : null;
 
