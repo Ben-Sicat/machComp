@@ -1,16 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Trapezoid } from './pages/index';
+import React, { useEffect } from 'react';
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path='/' element={<Trapezoid />} />
-        {/* <Route path="/machinefour" element={} /> */}
-      </Routes>
-    </Router>
-  );
+  useEffect(() => {
+    window.location.href = 'https://main--dashing-salmiakki-1fef6e.netlify.app/taylor-approximation';
+  }, []);
+
+  return null;
 }
 
 export default App;
